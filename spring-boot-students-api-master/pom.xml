@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.cognixia.jump</groupId>
-	<artifactId>rest-mysql</artifactId>
+	<artifactId>student-springboot-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>RestMySQL</name>
-	<description>Demo project for Spring Boot</description>
+	<name>student-springboot-api</name>
+	<description>Deployable Spring Boot API for AWS</description>
 	<packaging>jar</packaging>
 
 	<properties>
