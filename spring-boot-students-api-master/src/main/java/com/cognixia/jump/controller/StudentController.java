@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cognixia.jump.exception.ResourceNotFoundException;
 import com.cognixia.jump.model.Student;
 import com.cognixia.jump.repository.StudentRepository;
 
@@ -30,27 +32,30 @@ public class StudentController {
 	StudentRepository service;
 	
 	@CrossOrigin
-	@GetMapping("/students")
-	public List<Student> getAllStudents() {
+	@GetMapping("/student")
+	public ResponseEntity<List<Student>> getAllStudents() {
 		
-		return service.findAll();
+		List<Student> studentList = service.findAll();
+		
+		return new ResponseEntity<List<Student>>(studentList, HttpStatus.OK );
 	}
 	
 	@CrossOrigin
-	@GetMapping("/students/{id}")
-	public Student getStudent(@PathVariable long id) {
+	@GetMapping("/student/{id}")
+	public ResponseEntity<Student> getStudent(@PathVariable long id) throws Exception {
 		
 		Optional<Student> studentOpt = service.findById(id);
 		
-		if(studentOpt.isPresent()) {
-			return studentOpt.get();
+		if(studentOpt.isEmpty()) {
+			throw new ResourceNotFoundException("Student with id: " + String.valueOf(id));
 		}
 		
-		return new Student();
+		return new ResponseEntity<Student>(studentOpt.get(), HttpStatus.OK);
+		
 	}
 	
 	@CrossOrigin
-	@PostMapping("/add/student")
+	@PostMapping("/student")
 	public void addStudent(@RequestBody Student newStudent) {
 		
 		newStudent.setId(-1L);
