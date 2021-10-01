@@ -1,28 +1,34 @@
 package com.cognixia.jump.controller;
 
+
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cognixia.jump.exception.ResourceNotFoundException;
-import com.cognixia.jump.exception.UserAlreadyExistsException;
+
 import com.cognixia.jump.model.AuthenticationRequest;
 import com.cognixia.jump.model.AuthenticationResponse;
-import com.cognixia.jump.model.Student;
+
 import com.cognixia.jump.model.User;
 import com.cognixia.jump.repository.UserRepository;
 import com.cognixia.jump.services.MyUserDetailsService;
@@ -48,32 +54,40 @@ public class UserAndSessionController {
 	@Autowired
 	private JwtUtil jwtTokenUtil;
 
-	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+	@RequestMapping(value = "/login", method = RequestMethod.POST)
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest) 
 			throws Exception {
-
-		try {
-			
-			authenticationManager.authenticate(
-					new UsernamePasswordAuthenticationToken(
-							authenticationRequest.getUsername(), 
-							authenticationRequest.getPassword())
-					);
-			
-		} catch (BadCredentialsException e) {
-			throw new Exception("Incorrect Username or password", e);
+		final String jwtLogin = userService.loginUser(authenticationRequest);
+		if (jwtLogin.equals("login failed")) {
+			return new ResponseEntity<>(jwtLogin, HttpStatus.BAD_REQUEST);
 		}
-		
-		final UserDetails userDetails = myUserDetailsService
-				.loadUserByUsername(
-						authenticationRequest.getUsername());
-		
-		final String jwt = jwtTokenUtil.generateTokens(userDetails);
-		
-		return ResponseEntity.ok(new AuthenticationResponse(jwt));
+		return ResponseEntity.ok(jwtLogin);
 		
 	}
 	
+	@RequestMapping(value = "/logout" , method = RequestMethod.GET)
+	public ResponseEntity<?> invalidateAuthenticationToken (Authentication authentication) throws Exception {
+		;
+		
+		return ResponseEntity.ok(userService.logoutUser(authentication));
+	}
+	
+	// Get the current User info
+	@GetMapping("/user/current")
+	public ResponseEntity<?> getLoggedInUser(Authentication auth) {
+		
+		// Take in HTTP Servlet Request Object
+//		String jwt = req.getHeader("Authorization").split(" ")[1];
+//		String value = jwtTokenUtil.extractUsername(jwt);
+//		return ResponseEntity.ok(value);
+		
+		// Take in the Authentication from the Request, you need to change req to Datatype "Authentication".
+		Object user = auth.getPrincipal(); 
+		
+		return ResponseEntity.ok(user);
+	}
+	
+	// Create a new User
 	@RequestMapping(value = "/user", method = RequestMethod.POST)
 	public ResponseEntity<?> createNewUser(@RequestBody AuthenticationRequest user ) throws Exception {
 		
@@ -107,5 +121,7 @@ public class UserAndSessionController {
 		return ResponseEntity.ok("User with id: " + id + " has been deleted.");
 			
 	}
+	
+
 	
 }

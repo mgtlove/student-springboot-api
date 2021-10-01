@@ -32,20 +32,24 @@ public class User implements Serializable {
 	@Column(columnDefinition = "boolean default true")
 	private boolean enabled;
 	
+	@Column(columnDefinition = "boolean default false")
+	private boolean online;
+	
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Role role;
 	
 	public User() {
-		this(-1L, "N/A", "N/A", false, Role.ROLE_USER);
+		this(-1L, "N/A", "N/A", false, false, Role.ROLE_USER);
 	}
 
-	public User(Long id, String username, String password, boolean enabled, Role role) {
+	public User(Long id, String username, String password, boolean enabled, boolean online, Role role) {
 		super();
 		this.id = id;
 		this.username = username;
 		this.password = password;
 		this.enabled = enabled;
+		this.online = online;
 		this.role = role;
 	}
 
@@ -81,6 +85,14 @@ public class User implements Serializable {
 		this.enabled = enabled;
 	}
 
+	public boolean isOnline() {
+		return online;
+	}
+
+	public void setOnline(boolean online) {
+		this.online = online;
+	}
+
 	public Role getRole() {
 		return role;
 	}
@@ -89,14 +101,10 @@ public class User implements Serializable {
 		this.role = role;
 	}
 
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
-
 	@Override
 	public String toString() {
 		return "User [id=" + id + ", username=" + username + ", password=" + password + ", enabled=" + enabled
-				+ ", role=" + role + "]";
+				+ ", online=" + online + ", role=" + role + "]";
 	}
 	
 }
