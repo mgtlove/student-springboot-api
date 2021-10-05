@@ -13,24 +13,45 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(ResourceNotFoundException.class)
 	public ResponseEntity<?> studentNotFoundException(ResourceNotFoundException ex, WebRequest request) {
+		String message = ex.getMessage().split("exception.")[1];
 		
-		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), message, request.getDescription(false));
 		
 		return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
 	}
 	
 	@ExceptionHandler(UserAlreadyExistsException.class)
 	public ResponseEntity<?> userAlreadyExistsException(UserAlreadyExistsException ex, WebRequest request) {
+		String message = ex.getMessage().split("exception.")[1];
 		
-		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), message, request.getDescription(false));
 		
 		return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
 	}
 	
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity<?> globalExceptionHandler(Exception ex, WebRequest request) {
+	@ExceptionHandler(LoginFailedException.class)
+	public ResponseEntity<?> loginFailedException(LoginFailedException ex, WebRequest request) {
+		String message = ex.getMessage().split("exception")[1];
 		
 		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
+		
+		return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(LogoutFailedException.class)
+	public ResponseEntity<?> logoutFailedExistsException(LogoutFailedException ex, WebRequest request) {
+		//String message =  ex.getLocalizedMessage()..split("exception.")[1];
+		
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
+		
+		return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<?> globalExceptionHandler(Exception ex, WebRequest request) {
+		String message = ex.getMessage().split("exception.")[1];
+		
+		ErrorDetails errorDetails = new ErrorDetails(new Date(), message, request.getDescription(false));
 		
 		return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
